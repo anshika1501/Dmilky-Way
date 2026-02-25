@@ -1,0 +1,233 @@
+{
+  "info": {
+    "name": "Milkman API",
+    "_postman_id": "8f7c1b2a-9c3f-4f2b-9c60-1b5a2f0d7e21",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Postman collection for Milkman Django REST APIs"
+  },
+  "item": [
+    {
+      "name": "Category",
+      "item": [
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Milk Products\",\n  \"description\": \"All milk-related items\"\n}"
+            },
+            "url": "{{base_url}}/category/"
+          }
+        },
+        {
+          "name": "List Categories",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/category/"
+          }
+        },
+        {
+          "name": "Get Category by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/category/{{category_id}}/"
+          }
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Milk & Dairy\",\n  \"description\": \"Updated description\",\n  \"is_active\": true\n}"
+            },
+            "url": "{{base_url}}/category/{{category_id}}/"
+          }
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/category/{{category_id}}/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Product",
+      "item": [
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cow Milk\",\n  \"category\": {{category_id}},\n  \"is_active\": true\n}"
+            },
+            "url": "{{base_url}}/product/"
+          }
+        },
+        {
+          "name": "List Products",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/product/"
+          }
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/product/{{product_id}}/"
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cow Milk (A2)\",\n  \"category\": {{category_id}},\n  \"is_active\": true\n}"
+            },
+            "url": "{{base_url}}/product/{{product_id}}/"
+          }
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/product/{{product_id}}/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customer",
+      "item": [
+        {
+          "name": "Create Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Rahul\",\n  \"last_name\": \"Sharma\",\n  \"email\": \"rahul.sharma@example.com\",\n  \"phone\": \"9876543210\",\n  \"address\": \"Sector 15, Noida\"\n}"
+            },
+            "url": "{{base_url}}/customer/"
+          }
+        },
+        {
+          "name": "List Customers",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/customer/"
+          }
+        },
+        {
+          "name": "Get Customer by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/customer/{{customer_id}}/"
+          }
+        },
+        {
+          "name": "Update Customer",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Rahul\",\n  \"last_name\": \"S.\",\n  \"email\": \"rahul.sharma@example.com\",\n  \"phone\": \"9876543210\",\n  \"address\": \"Sector 15, Noida\",\n  \"is_active\": true\n}"
+            },
+            "url": "{{base_url}}/customer/{{customer_id}}/"
+          }
+        },
+        {
+          "name": "Delete Customer",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/customer/{{customer_id}}/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Subscriptions",
+      "item": [
+        {
+          "name": "Create Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer\": {{customer_id}},\n  \"product\": {{product_id}},\n  \"subscription_type\": \"daily\",\n  \"quantity\": 1,\n  \"start_date\": \"2026-02-24\",\n  \"is_active\": true,\n  \"is_paused\": false\n}"
+            },
+            "url": "{{base_url}}/subscriptions/"
+          }
+        },
+        {
+          "name": "List Subscriptions",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/subscriptions/"
+          }
+        },
+        {
+          "name": "Get Subscription by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/subscriptions/{{subscription_id}}/"
+          }
+        },
+        {
+          "name": "Update Subscription",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer\": {{customer_id}},\n  \"product\": {{product_id}},\n  \"subscription_type\": \"alternate\",\n  \"quantity\": 2,\n  \"start_date\": \"2026-02-24\",\n  \"end_date\": null,\n  \"is_active\": true,\n  \"is_paused\": false\n}"
+            },
+            "url": "{{base_url}}/subscriptions/{{subscription_id}}/"
+          }
+        },
+        {
+          "name": "Delete Subscription",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/subscriptions/{{subscription_id}}/"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000" },
+    { "key": "category_id", "value": "1" },
+    { "key": "product_id", "value": "1" },
+    { "key": "customer_id", "value": "1" },
+    { "key": "subscription_id", "value": "1" }
+  ]
+}
