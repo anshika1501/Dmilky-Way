@@ -42,75 +42,76 @@ function MySubscription() {
     };
 
     return (
-        <>
+        <div className="user-theme animate-fade-in">
             <Navbar />
 
-            <div style={styles.container}>
-                <h2>My Subscriptions</h2>
+            <div className="container">
+                <header className="page-header">
+                    <h2 style={{ fontSize: '36px' }}>My Subscriptions</h2>
+                    <p style={{ color: 'var(--text-secondary)' }}>Manage your active and past milk delivery plans</p>
+                </header>
 
-                {loading && <p>Loading...</p>}
-                {error && <p style={styles.error}>{error}</p>}
-
-                {!loading && subscriptions.length === 0 ? (
-                    <p>No subscriptions found. Browse products to subscribe!</p>
+                {loading ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="glass-card sub-card">
+                                <div className="skeleton" style={{ height: '60px', width: '300px' }}></div>
+                                <div className="skeleton" style={{ height: '40px', width: '120px' }}></div>
+                            </div>
+                        ))}
+                    </div>
+                ) : error ? (
+                    <div className="glass-card" style={{ padding: '40px', textAlign: 'center', color: 'var(--danger)' }}>
+                        <p>{error}</p>
+                        <button className="btn-outline" style={{ marginTop: '20px' }} onClick={fetchSubscriptions}>Retry</button>
+                    </div>
+                ) : subscriptions.length === 0 ? (
+                    <div className="glass-card" style={{ padding: '80px 40px', textAlign: 'center' }}>
+                        <div style={{ fontSize: '64px', marginBottom: '24px' }}>📦</div>
+                        <h3>No Subscriptions Found</h3>
+                        <p style={{ color: 'var(--text-secondary)', marginBottom: '32px' }}>
+                            You haven't subscribed to any products yet. Browse our shop to start!
+                        </p>
+                        <button className="btn-primary" onClick={() => navigate('/')}>
+                            Explore Products
+                        </button>
+                    </div>
                 ) : (
-                    <div style={styles.grid}>
-                        {subscriptions.map(sub => (
-                            <div key={sub.id} style={styles.card}>
-                                <h3>{sub.product_name}</h3>
-                                <p><strong>Type:</strong> {sub.subscription_type}</p>
-                                <p><strong>Quantity:</strong> {sub.quantity}</p>
-                                <p><strong>Start Date:</strong> {sub.start_date}</p>
-                                {sub.end_date && <p><strong>End Date:</strong> {sub.end_date}</p>}
-                                <span style={sub.is_active ? styles.active : styles.inactive}>
-                                    {sub.is_active ? "Active" : "Inactive"}
-                                </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingBottom: '80px' }}>
+                        {subscriptions.map((sub, index) => (
+                            <div
+                                key={sub.id}
+                                className="glass-card sub-card animate-fade-up"
+                                style={{ animationDelay: `${0.1 * index}s` }}
+                            >
+                                <div className="sub-info">
+                                    <h3 style={{ fontSize: '20px' }}>{sub.product_name}</h3>
+                                    <div style={{ display: 'flex', gap: '16px', fontSize: '14px', color: 'var(--text-secondary)' }}>
+                                        <span><strong>Plan:</strong> {sub.subscription_type}</span>
+                                        <span><strong>Qty:</strong> {sub.quantity} units</span>
+                                    </div>
+                                    <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                                        <strong>Active from:</strong> {sub.start_date} {sub.end_date && `to ${sub.end_date}`}
+                                    </div>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+                                    <div className="sub-status">
+                                        <span className={`status-indicator ${sub.is_active ? 'active' : ''}`}></span>
+                                        <span className={`badge ${sub.is_active ? 'badge-success' : 'badge-danger'}`}>
+                                            {sub.is_active ? "Active" : "Inactive"}
+                                        </span>
+                                    </div>
+                                    <button className="btn-outline" style={{ padding: '8px 16px', fontSize: '14px' }}>
+                                        Details
+                                    </button>
+                                </div>
                             </div>
                         ))}
                     </div>
                 )}
             </div>
-        </>
+        </div>
     );
 }
-
-const styles = {
-    container: {
-        padding: "30px",
-        maxWidth: "1200px",
-        margin: "0 auto"
-    },
-    grid: {
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-        gap: "20px",
-        marginTop: "20px"
-    },
-    card: {
-        padding: "20px",
-        border: "1px solid #ddd",
-        borderRadius: "8px",
-        backgroundColor: "#fff"
-    },
-    active: {
-        display: "inline-block",
-        padding: "4px 8px",
-        backgroundColor: "#e8f5e9",
-        color: "#2e7d32",
-        borderRadius: "4px",
-        fontSize: "12px"
-    },
-    inactive: {
-        display: "inline-block",
-        padding: "4px 8px",
-        backgroundColor: "#ffebee",
-        color: "#c62828",
-        borderRadius: "4px",
-        fontSize: "12px"
-    },
-    error: {
-        color: "red"
-    }
-};
 
 export default MySubscription;

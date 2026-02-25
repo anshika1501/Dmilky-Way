@@ -42,101 +42,102 @@ function Register() {
     };
 
     return (
-        <>
+        <div className="user-theme animate-fade-in">
             <Navbar />
-            <div style={styles.container}>
-                <h2>Register</h2>
-                <form onSubmit={handleRegister} style={styles.form}>
-                    <input
-                        type="text"
-                        placeholder="Username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        style={styles.input}
-                        required
-                    />
-                    <input
-                        type="text"
-                        placeholder="First Name"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        style={styles.input}
-                        required
-                    />
-                    <input
-                        type="text"
-                        placeholder="Last Name"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        style={styles.input}
-                        required
-                    />
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        style={styles.input}
-                        required
-                    />
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        style={styles.input}
-                        required
-                    />
-                    <input
-                        type="password"
-                        placeholder="Confirm Password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        style={styles.input}
-                        required
-                    />
-                    <button type="submit" style={styles.button} disabled={loading}>
-                        {loading ? "Registering..." : "Register"}
-                    </button>
-                </form>
-                <p style={styles.linkText}>
-                    Already have an account? <Link to="/login">Login</Link>
-                </p>
+            <div className="auth-page">
+                <div className="glass-card auth-card animate-fade-up">
+                    <div className="auth-header">
+                        <h2>Join Milkman</h2>
+                        <p style={{ color: 'var(--text-secondary)' }}>Start your fresh milk subscription today</p>
+                    </div>
+
+                    <form onSubmit={handleRegister} className="auth-form">
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                            <div className="form-group">
+                                <label>First Name</label>
+                                <input
+                                    type="text"
+                                    placeholder="John"
+                                    value={firstName}
+                                    onChange={(e) => setFirstName(e.target.value)}
+                                    className="input-field"
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Last Name</label>
+                                <input
+                                    type="text"
+                                    placeholder="Doe"
+                                    value={lastName}
+                                    onChange={(e) => setLastName(e.target.value)}
+                                    className="input-field"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Username</label>
+                            <input
+                                type="text"
+                                placeholder="Choose a username"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                className="input-field"
+                                required
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Email Address</label>
+                            <input
+                                type="email"
+                                placeholder="email@example.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="input-field"
+                                required
+                            />
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                            <div className="form-group">
+                                <label>Password</label>
+                                <input
+                                    type="password"
+                                    placeholder="••••••••"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="input-field"
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Confirm</label>
+                                <input
+                                    type="password"
+                                    placeholder="••••••••"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    className="input-field"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <button type="submit" className="btn-primary" style={{ marginTop: '12px' }} disabled={loading}>
+                            {loading ? "Creating Account..." : "Create Free Account"}
+                        </button>
+                    </form>
+
+                    <div className="auth-footer">
+                        Already have an account? <Link to="/login">Sign in instead</Link>
+                    </div>
+                </div>
             </div>
-        </>
+        </div>
     );
 }
-
-const styles = {
-    container: {
-        padding: "30px",
-        maxWidth: "400px",
-        margin: "0 auto"
-    },
-    form: {
-        display: "flex",
-        flexDirection: "column",
-        gap: "15px"
-    },
-    input: {
-        padding: "10px",
-        fontSize: "16px",
-        borderRadius: "4px",
-        border: "1px solid #ddd"
-    },
-    button: {
-        padding: "10px 20px",
-        fontSize: "16px",
-        backgroundColor: "#4caf50",
-        color: "white",
-        border: "none",
-        borderRadius: "4px",
-        cursor: "pointer"
-    },
-    linkText: {
-        marginTop: "15px",
-        textAlign: "center"
-    }
-};
 
 export default Register;

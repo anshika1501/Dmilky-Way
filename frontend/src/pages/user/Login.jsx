@@ -24,76 +24,61 @@ function Login() {
             }
         } catch (err) {
             console.error("Login error:", err);
-            alert("Invalid credentials");
+            alert("Invalid credentials. Please try again.");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <>
+        <div className="user-theme animate-fade-in">
             <Navbar />
-            <div style={styles.container}>
-                <h2>Login</h2>
-                <form onSubmit={handleLogin} style={styles.form}>
-                    <input
-                        type="text"
-                        placeholder="Username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        style={styles.input}
-                        required
-                    />
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        style={styles.input}
-                        required
-                    />
-                    <button type="submit" style={styles.button} disabled={loading}>
-                        {loading ? "Logging in..." : "Login"}
-                    </button>
-                </form>
-                <p style={styles.linkText}>
-                    Don't have an account? <Link to="/register">Register</Link>
-                </p>
+            <div className="auth-page">
+                <div className="glass-card auth-card animate-fade-up">
+                    <div className="auth-header">
+                        <h2>Welcome Back</h2>
+                        <p style={{ color: 'var(--text-secondary)' }}>Log in to manage your daily milk supply</p>
+                    </div>
+
+                    <form onSubmit={handleLogin} className="auth-form">
+                        <div className="form-group">
+                            <label htmlFor="username">Username</label>
+                            <input
+                                id="username"
+                                type="text"
+                                placeholder="Enter your username"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                className="input-field"
+                                required
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="password">Password</label>
+                            <input
+                                id="password"
+                                type="password"
+                                placeholder="••••••••"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="input-field"
+                                required
+                            />
+                        </div>
+
+                        <button type="submit" className="btn-primary" style={{ marginTop: '12px' }} disabled={loading}>
+                            {loading ? "Logging in..." : "Login to Account"}
+                        </button>
+                    </form>
+
+                    <div className="auth-footer">
+                        Don't have an account? <Link to="/register">Create one for free</Link>
+                    </div>
+                </div>
             </div>
-        </>
+        </div>
     );
 }
-
-const styles = {
-    container: {
-        padding: "30px",
-        maxWidth: "400px",
-        margin: "0 auto"
-    },
-    form: {
-        display: "flex",
-        flexDirection: "column",
-        gap: "15px"
-    },
-    input: {
-        padding: "10px",
-        fontSize: "16px",
-        borderRadius: "4px",
-        border: "1px solid #ddd"
-    },
-    button: {
-        padding: "10px 20px",
-        fontSize: "16px",
-        backgroundColor: "#4caf50",
-        color: "white",
-        border: "none",
-        borderRadius: "4px",
-        cursor: "pointer"
-    },
-    linkText: {
-        marginTop: "15px",
-        textAlign: "center"
-    }
-};
 
 export default Login;

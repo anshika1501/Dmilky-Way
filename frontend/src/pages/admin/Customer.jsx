@@ -41,7 +41,8 @@ function Customer() {
         (c) =>
             `${c.first_name} ${c.last_name}`.toLowerCase().includes(search.toLowerCase()) ||
             (c.email && c.email.toLowerCase().includes(search.toLowerCase())) ||
-            (c.phone && c.phone.includes(search))
+            (c.phone && c.phone.includes(search)) ||
+            (c.username && c.username.toLowerCase().includes(search.toLowerCase()))
     );
 
     return (
@@ -85,6 +86,7 @@ function Customer() {
                         {[...Array(6)].map((_, i) => (
                             <div className="skeleton-row" key={i}>
                                 <div className="skeleton-cell w-sm" />
+                                <div className="skeleton-cell w-md" />
                                 <div className="skeleton-cell w-lg" />
                                 <div className="skeleton-cell w-xl" />
                                 <div className="skeleton-cell w-md" />
@@ -114,6 +116,7 @@ function Customer() {
                         <thead>
                             <tr>
                                 <th>ID</th>
+                                <th>Username</th>
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Phone</th>
@@ -126,6 +129,7 @@ function Customer() {
                             {filtered.map((c) => (
                                 <tr key={c.id}>
                                     <td><span className="cell-main">#{c.id}</span></td>
+                                    <td>{c.username || "—"}</td>
                                     <td><span className="cell-main">{c.first_name} {c.last_name}</span></td>
                                     <td>{c.email}</td>
                                     <td>{c.phone || "—"}</td>

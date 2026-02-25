@@ -26,74 +26,89 @@ function UserHome() {
     };
 
     return (
-        <>
+        <div className="user-theme animate-fade-in">
             <Navbar />
 
-            <div style={styles.container}>
-                <h2>Available Products</h2>
-
-                {loading && <p>Loading...</p>}
-                {error && <p style={styles.error}>{error}</p>}
-
-                <div style={styles.grid}>
-                    {products.filter(p => p.is_active).map(product => (
-                        <div key={product.id} style={styles.card}>
-                            <h3>{product.name}</h3>
-                            <p style={styles.price}>₹ {product.price}</p>
-                            <p>Stock: {product.stock > 0 ? `${product.stock} available` : "Out of stock"}</p>
-                            <span style={product.is_active ? styles.available : styles.unavailable}>
-                                {product.is_active ? "Available" : "Unavailable"}
-                            </span>
-                        </div>
-                    ))}
+            {/* Hero Section */}
+            <section className="hero">
+                <div className="container">
+                    <span className="hero-tag animate-fade-up">🥛 Freshness Delivered</span>
+                    <h1 className="hero-title animate-fade-up" style={{ animationDelay: '0.1s' }}>
+                        The Purest Milk From <span>Local Farms</span> To Your Door
+                    </h1>
+                    <p className="hero-desc animate-fade-up" style={{ animationDelay: '0.2s' }}>
+                        Experience the taste of nature with our organic, non-pasteurized milk
+                        delivered fresh every morning before you wake up.
+                    </p>
+                    <div className="animate-fade-up" style={{ animationDelay: '0.3s' }}>
+                        <button className="btn-primary" onClick={() => window.scrollTo({ top: 800, behavior: 'smooth' })}>
+                            Shop Now
+                        </button>
+                    </div>
                 </div>
+            </section>
+
+            <div className="container" style={{ paddingBottom: '80px' }}>
+                <div className="section-header" style={{ marginBottom: '40px' }}>
+                    <h2 style={{ fontSize: '32px' }}>Choose Your Blend</h2>
+                    <p style={{ color: 'var(--text-secondary)' }}>Select from our premium range of dairy products</p>
+                </div>
+
+                {loading ? (
+                    <div className="product-grid">
+                        {[1, 2, 3, 4].map(i => (
+                            <div key={i} className="glass-card product-card">
+                                <div className="skeleton" style={{ height: '240px' }}></div>
+                                <div className="skeleton" style={{ height: '24px', width: '60%' }}></div>
+                                <div className="skeleton" style={{ height: '32px', width: '40%' }}></div>
+                                <div className="skeleton" style={{ height: '48px', marginTop: 'auto' }}></div>
+                            </div>
+                        ))}
+                    </div>
+                ) : error ? (
+                    <div className="glass-card" style={{ padding: '40px', textAlign: 'center', color: 'var(--danger)' }}>
+                        <p>{error}</p>
+                        <button className="btn-outline" style={{ marginTop: '20px' }} onClick={fetchProducts}>Retry</button>
+                    </div>
+                ) : (
+                    <div className="product-grid">
+                        {products.filter(p => p.is_active).map((product, index) => (
+                            <div
+                                key={product.id}
+                                className="glass-card product-card animate-fade-up"
+                                style={{ animationDelay: `${0.1 * index}s` }}
+                            >
+                                <div className="product-image-blank">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                        <path d="M7 3h10a2 2 0 0 1 2 2v15a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
+                                        <path d="M5 7h14" />
+                                        <path d="m9 12 2 2 4-4" />
+                                    </svg>
+                                </div>
+                                <div className="product-info">
+                                    <h3>{product.name}</h3>
+                                    <div className="product-price">₹ {product.price}</div>
+                                </div>
+                                <div className="product-meta">
+                                    <span className={product.stock > 0 ? "badge badge-success" : "badge badge-danger"}>
+                                        {product.stock > 0 ? `${product.stock} Left` : "Out of Stock"}
+                                    </span>
+                                    <span className="badge badge-success">Available</span>
+                                </div>
+                                <button
+                                    className="btn-primary"
+                                    style={{ marginTop: '16px' }}
+                                    disabled={product.stock <= 0}
+                                >
+                                    {product.stock > 0 ? 'Subscribe Now' : 'Out of Stock'}
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
-        </>
+        </div>
     );
 }
-
-const styles = {
-    container: {
-        padding: "30px",
-        maxWidth: "1200px",
-        margin: "0 auto"
-    },
-    grid: {
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-        gap: "20px",
-        marginTop: "20px"
-    },
-    card: {
-        padding: "20px",
-        border: "1px solid #ddd",
-        borderRadius: "8px",
-        backgroundColor: "#fff"
-    },
-    price: {
-        fontSize: "18px",
-        fontWeight: "bold",
-        color: "#4caf50"
-    },
-    available: {
-        display: "inline-block",
-        padding: "4px 8px",
-        backgroundColor: "#e8f5e9",
-        color: "#2e7d32",
-        borderRadius: "4px",
-        fontSize: "12px"
-    },
-    unavailable: {
-        display: "inline-block",
-        padding: "4px 8px",
-        backgroundColor: "#ffebee",
-        color: "#c62828",
-        borderRadius: "4px",
-        fontSize: "12px"
-    },
-    error: {
-        color: "red"
-    }
-};
 
 export default UserHome;
