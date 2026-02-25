@@ -1,13 +1,44 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .models import Subscription
 from .serializers import SubscriptionSerializer
 from customer.models import Customer
 
 
+# -------------------------
+# Admin Subscription API (No auth required - for admin panel)
+# -------------------------
+class AdminSubscriptionAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, pk=None):
+        if pk:
+            try:
+                subscription = Subscription.objects.get(pk=pk)
+            except Subscription.DoesNotExist:
+                return Response({"error": "Subscription not found"}, status=404)
+            serializer = SubscriptionSerializer(subscription)
+            return Response(serializer.data)
+
+        subscriptions = Subscription.objects.all()
+        serializer = SubscriptionSerializer(subscriptions, many=True)
+        return Response(serializer.data)
+
+    def delete(self, request, pk):
+        try:
+            subscription = Subscription.objects.get(pk=pk)
+        except Subscription.DoesNotExist:
+            return Response({"error": "Subscription not found"}, status=404)
+        subscription.delete()
+        return Response({"message": "Subscription deleted"}, status=204)
+
+
+# -------------------------
+# User Subscription API (Requires authentication)
+# -------------------------
 class SubscriptionAPIView(APIView):
 
     permission_classes = [IsAuthenticated]

@@ -11,16 +11,20 @@ function Navbar() {
 
     return (
         <nav style={styles.nav}>
-            <h2>Milkman</h2>
+            <Link to="/" style={{ textDecoration: 'none', color: 'white' }}>
+                <h2>Milkman</h2>
+            </Link>
 
             <div>
                 {token ? (
                     <>
-                        <Link to="/user/home" style={styles.link}>My Subscription</Link>
+                        <Link to="/" style={styles.link}>Home</Link>
+                        <Link to="/my-subscription" style={styles.link}>My Subscription</Link>
                         <button onClick={handleLogout} style={styles.btn}>Logout</button>
                     </>
                 ) : (
                     <>
+                        <Link to="/" style={styles.link}>Home</Link>
                         <Link to="/login" style={styles.link}>Login</Link>
                         <Link to="/register" style={styles.link}>Register</Link>
                     </>
