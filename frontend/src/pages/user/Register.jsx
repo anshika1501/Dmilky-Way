@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { userAPI } from "../../api/axios";
 import Navbar from "../../components/Navbar";
 
@@ -12,6 +12,12 @@ function Register() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Check if redirected from checkout or cart
+    const fromCheckout = location.state?.from === "/checkout";
+    const fromCart = location.state?.from === "/cart";
+    const productState = location.state?.product;
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -31,7 +37,14 @@ function Register() {
                 password
             });
             alert("Registration successful! Please login.");
-            navigate("/login");
+            // Pass state to login page for redirect after login
+            if (fromCheckout && productState) {
+                navigate("/login", { state: { from: "/checkout", product: productState } });
+            } else if (fromCart) {
+                navigate("/login", { state: { from: "/cart" } });
+            } else {
+                navigate("/login");
+            }
         } catch (err) {
             console.error("Registration error:", err);
             const message = err.response?.data?.error || "Registration failed. Please try again.";

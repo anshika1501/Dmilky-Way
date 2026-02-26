@@ -11,6 +11,7 @@ class Product(models.Model):
         related_name='products'
     )
 
+    image = models.URLField(max_length=500, blank=True, null=True)
     price = models.DecimalField(max_digits=6, decimal_places=2,default=0)
     stock = models.IntegerField(default=0)
 

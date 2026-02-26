@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { userAPI } from "../../api/axios";
 import Navbar from "../../components/Navbar";
 
@@ -8,6 +8,12 @@ function Login() {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Check if redirected from checkout or cart
+    const fromCheckout = location.state?.from === "/checkout";
+    const fromCart = location.state?.from === "/cart";
+    const productState = location.state?.product;
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -20,7 +26,14 @@ function Login() {
                 if (response.data.refresh) {
                     localStorage.setItem("refresh", response.data.refresh);
                 }
-                navigate("/my-subscription");
+                // Redirect back to original page
+                if (fromCheckout && productState) {
+                    navigate("/checkout", { state: { product: productState } });
+                } else if (fromCart) {
+                    navigate("/cart");
+                } else {
+                    navigate("/my-subscription");
+                }
             }
         } catch (err) {
             console.error("Login error:", err);
@@ -39,6 +52,34 @@ function Login() {
                         <h2>Welcome Back</h2>
                         <p style={{ color: 'var(--text-secondary)' }}>Log in to manage your daily milk supply</p>
                     </div>
+
+                    {fromCheckout && (
+                        <div style={{
+                            background: 'rgba(0,212,170,0.1)',
+                            border: '1px solid var(--primary)',
+                            borderRadius: '8px',
+                            padding: '12px 16px',
+                            marginBottom: '20px',
+                            fontSize: '14px',
+                            color: 'var(--primary)'
+                        }}>
+                            Please sign in to complete your purchase
+                        </div>
+                    )}
+
+                    {fromCart && (
+                        <div style={{
+                            background: 'rgba(0,212,170,0.1)',
+                            border: '1px solid var(--primary)',
+                            borderRadius: '8px',
+                            padding: '12px 16px',
+                            marginBottom: '20px',
+                            fontSize: '14px',
+                            color: 'var(--primary)'
+                        }}>
+                            Please sign in to checkout your cart
+                        </div>
+                    )}
 
                     <form onSubmit={handleLogin} className="auth-form">
                         <div className="form-group">
