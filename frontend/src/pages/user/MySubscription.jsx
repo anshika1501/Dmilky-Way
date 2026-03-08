@@ -93,6 +93,7 @@ function MySubscription() {
             product: sub.product,
             quantity: sub.quantity,
             subscription_type: sub.subscription_type,
+            plan_type: sub.plan_type || '1month',
             is_active: sub.is_active,
             is_paused: sub.is_paused
         });
@@ -101,6 +102,16 @@ function MySubscription() {
     const handleCancelEdit = () => {
         setEditingId(null);
         setEditForm({});
+    };
+
+    const handleQuickPlanChange = async (id, newPlan) => {
+        try {
+            await api.put(`/subscriptions/${id}/`, { plan_type: newPlan });
+            fetchSubscriptions();
+        } catch (err) {
+            console.error("Error changing plan:", err);
+            alert("Failed to change plan");
+        }
     };
 
     const handleSaveEdit = async (id) => {
@@ -325,6 +336,27 @@ function MySubscription() {
                                             </div>
 
                                             <div>
+                                                <label style={{ display: "block", marginBottom: "8px", color: "var(--text-secondary)", fontSize: "14px" }}>Subscription Plan</label>
+                                                <select
+                                                    value={editForm.plan_type}
+                                                    onChange={(e) => setEditForm({ ...editForm, plan_type: e.target.value })}
+                                                    style={{
+                                                        width: "100%",
+                                                        padding: "10px 16px",
+                                                        fontSize: "16px",
+                                                        borderRadius: "8px",
+                                                        border: "1px solid rgba(255,255,255,0.2)",
+                                                        background: "var(--bg-glass)",
+                                                        color: "var(--text-primary)"
+                                                    }}
+                                                >
+                                                    <option value="1month" style={{ background: "#1e293b" }}>1 Month (5% off)</option>
+                                                    <option value="3month" style={{ background: "#1e293b" }}>3 Months (10% off)</option>
+                                                    <option value="6month" style={{ background: "#1e293b" }}>6 Months (15% off)</option>
+                                                </select>
+                                            </div>
+
+                                            <div>
                                                 <label style={{ display: "block", marginBottom: "8px", color: "var(--text-secondary)", fontSize: "14px" }}>Status</label>
                                                 <select
                                                     value={editForm.is_paused ? "paused" : (editForm.is_active ? "active" : "inactive")}
@@ -367,8 +399,28 @@ function MySubscription() {
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
                                         <div className="sub-info">
                                             <h3 style={{ fontSize: "20px", marginBottom: "8px" }}>{sub.product_name}</h3>
-                                            <div style={{ display: "flex", gap: "16px", fontSize: "14px", color: "var(--text-secondary)", flexWrap: "wrap" }}>
-                                                <span><strong>Plan:</strong> {sub.subscription_type}</span>
+                                            <div style={{ display: "flex", gap: "16px", fontSize: "14px", color: "var(--text-secondary)", flexWrap: "wrap", alignItems: "center" }}>
+                                                <span><strong>Delivery:</strong> {sub.subscription_type}</span>
+                                                <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                                    <strong>Plan:</strong>
+                                                    <select
+                                                        value={sub.plan_type || '1month'}
+                                                        onChange={(e) => handleQuickPlanChange(sub.id, e.target.value)}
+                                                        style={{
+                                                            padding: "4px 8px",
+                                                            fontSize: "13px",
+                                                            borderRadius: "6px",
+                                                            border: "1px solid rgba(255,255,255,0.2)",
+                                                            background: "var(--bg-glass)",
+                                                            color: "var(--primary)",
+                                                            cursor: "pointer"
+                                                        }}
+                                                    >
+                                                        <option value="1month" style={{ background: "#1e293b" }}>1 Month (5% off)</option>
+                                                        <option value="3month" style={{ background: "#1e293b" }}>3 Months (10% off)</option>
+                                                        <option value="6month" style={{ background: "#1e293b" }}>6 Months (15% off)</option>
+                                                    </select>
+                                                </span>
                                                 <span><strong>Qty:</strong> {sub.quantity} units</span>
                                                 <span><strong>Price:</strong> ₹{products.find(p => p.id === sub.product)?.price || "N/A"}/unit</span>
                                             </div>

@@ -32,6 +32,7 @@ function UserHome() {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [showPlanModal, setShowPlanModal] = useState(false);
     const [recentlyAdded, setRecentlyAdded] = useState(null);
+    const [selectedPlanId, setSelectedPlanId] = useState("1month");
 
     useEffect(() => {
         fetchProducts();
@@ -65,6 +66,7 @@ function UserHome() {
 
     const openPlanModal = (product) => {
         setSelectedProduct(product);
+        setSelectedPlanId("1month");
         setShowPlanModal(true);
     };
 
@@ -365,11 +367,13 @@ function UserHome() {
                                 } else {
                                     totalPrice = prices.monthly6 * 6;
                                 }
+                                const isSelected = selectedPlanId === plan.id;
 
                                 return (
                                     <div
                                         key={plan.id}
                                         className="glass-card"
+                                        onClick={() => setSelectedPlanId(plan.id)}
                                         style={{
                                             padding: '20px',
                                             display: 'flex',
@@ -377,26 +381,39 @@ function UserHome() {
                                             alignItems: 'center',
                                             gap: '16px',
                                             flexWrap: 'wrap',
-                                            border: plan.discount === 10 ? '2px solid var(--primary)' : '1px solid rgba(255,255,255,0.1)'
+                                            border: isSelected ? '2px solid var(--primary)' : '1px solid rgba(255,255,255,0.1)',
+                                            background: isSelected ? 'rgba(0,212,170,0.1)' : undefined,
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease'
                                         }}
                                     >
-                                        <div style={{ flex: 1, minWidth: '200px' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                                                <span style={{ fontWeight: '600', fontSize: '16px' }}>{plan.name}</span>
-                                                {plan.discount > 0 && (
-                                                    <span className="badge badge-warning" style={{ fontSize: '11px' }}>
-                                                        {plan.discount}% OFF
-                                                    </span>
-                                                )}
-                                                {plan.discount === 10 && (
-                                                    <span className="badge" style={{ background: 'var(--primary)', color: '#000', fontSize: '11px' }}>
-                                                        POPULAR
-                                                    </span>
-                                                )}
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                            <div style={{
+                                                width: '20px',
+                                                height: '20px',
+                                                borderRadius: '50%',
+                                                border: isSelected ? '6px solid var(--primary)' : '2px solid rgba(255,255,255,0.3)',
+                                                background: isSelected ? '#fff' : 'transparent',
+                                                flexShrink: 0
+                                            }} />
+                                            <div>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                                    <span style={{ fontWeight: '600', fontSize: '16px' }}>{plan.name}</span>
+                                                    {plan.discount > 0 && (
+                                                        <span className="badge badge-warning" style={{ fontSize: '11px' }}>
+                                                            {plan.discount}% OFF
+                                                        </span>
+                                                    )}
+                                                    {plan.discount === 10 && (
+                                                        <span className="badge" style={{ background: 'var(--primary)', color: '#000', fontSize: '11px' }}>
+                                                            POPULAR
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                                                    {plan.duration}
+                                                </p>
                                             </div>
-                                            <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-                                                {plan.duration}
-                                            </p>
                                         </div>
                                         <div style={{ textAlign: 'right' }}>
                                             <div style={{ fontSize: '20px', fontWeight: '700', color: 'var(--primary)' }}>
@@ -408,13 +425,6 @@ function UserHome() {
                                                 </div>
                                             )}
                                         </div>
-                                        <button
-                                            className="btn-primary"
-                                            style={{ padding: '10px 20px', fontSize: '14px' }}
-                                            onClick={() => handleAddToCart(selectedProduct, plan.id)}
-                                        >
-                                            Add to Cart
-                                        </button>
                                     </div>
                                 );
                             })}
@@ -429,9 +439,9 @@ function UserHome() {
                             </button>
                             <button
                                 className="btn-primary"
-                                onClick={() => navigate('/cart')}
+                                onClick={() => handleAddToCart(selectedProduct, selectedPlanId)}
                             >
-                                View Cart
+                                Add to Cart
                             </button>
                         </div>
                     </div>

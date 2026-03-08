@@ -9,6 +9,12 @@ class Subscription(models.Model):
         ('alternate', 'Alternate Day'),
     ]
 
+    PLAN_TYPE_CHOICES = [
+        ('1month', '1 Month'),
+        ('3month', '3 Months'),
+        ('6month', '6 Months'),
+    ]
+
     customer = models.ForeignKey(
         Customer,
         on_delete=models.CASCADE,
@@ -23,6 +29,12 @@ class Subscription(models.Model):
     subscription_type = models.CharField(
         max_length=20,
         choices=SUBSCRIPTION_TYPE_CHOICES
+    )
+
+    plan_type = models.CharField(
+        max_length=20,
+        choices=PLAN_TYPE_CHOICES,
+        default='1month'
     )
 
     quantity = models.PositiveIntegerField(
