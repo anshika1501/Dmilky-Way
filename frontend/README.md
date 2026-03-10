@@ -65,3 +65,51 @@ Import the included Postman collection for quick testing:
 
 - CORS is enabled in the backend (`django-cors-headers`) for local development.
 - Ensure backend is running before using the frontend or Postman requests.
+
+## System Sequence Diagram
+
+Here is a high-level sequence diagram of the E-Milk Shop application flow:
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Frontend as React Frontend (Vite)
+    participant Auth as Django Auth API
+    participant API as Django REST API
+    participant DB as SQLite DB
+
+    %% User Browsing Flow
+    User->>Frontend: Access Homepage
+    Frontend->>API: GET /product/
+    API->>DB: Fetch Active Products
+    DB-->>API: Return Product Data
+    API-->>Frontend: 200 OK (Product List)
+    Frontend-->>User: Display Products & Plans
+
+    %% Authentication Flow
+    User->>Frontend: Click Login / Register
+    Frontend->>Auth: POST /api/token/ (or /register/)
+    Auth->>DB: Validate Credentials
+    DB-->>Auth: Validation Result
+    Auth-->>Frontend: 200 OK (JWT Access & Refresh Tokens)
+    Frontend-->>User: Update UI (Logged In State)
+    
+    %% Subscription/Checkout Flow
+    User->>Frontend: Add to Cart & Checkout Plan
+    Frontend->>API: POST /subscriptions/ (with JWT Authorization)
+    API->>Auth: Validate JWT Token
+    Auth-->>API: Token Valid
+    API->>DB: Create Subscription Record
+    DB-->>API: Record Created
+    API-->>Frontend: 201 Created (Subscription Details)
+    Frontend-->>User: Navigate to Thank You / Dashboard
+    
+    %% Admin Flow
+    actor Admin
+    Admin->>Frontend: Access Admin Dashboard
+    Frontend->>API: GET /customer/, /staff/, etc.
+    API->>DB: Fetch Admin Data
+    DB-->>API: Return Records
+    API-->>Frontend: 200 OK (Admin Views)
+    Frontend-->>Admin: Display Management Dashboard
+```
