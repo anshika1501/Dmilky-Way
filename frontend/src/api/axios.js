@@ -18,6 +18,25 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
+// Add response interceptor to handle 401 Unauthorized globally
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            // Don't intercept login failures
+            if (!error.config.url.includes('/api/token/')) {
+                if (localStorage.getItem("access")) {
+                    localStorage.removeItem("access");
+                    localStorage.removeItem("refresh");
+                    localStorage.removeItem("user");
+                    window.location.reload();
+                }
+            }
+        }
+        return Promise.reject(error);
+    }
+);
+
 // Admin API endpoints (no auth required)
 export const adminAPI = {
     // Customers
