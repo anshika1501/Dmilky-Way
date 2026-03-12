@@ -30,6 +30,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     '[::1]',
     '135.235.139.169',
+    'milkman-api.anshikapriya.online',
 ]
 
 
