@@ -1,14 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
-
-const weightOptions = [
-    { value: 0.5, label: "Half kg (500g)" },
-    { value: 1, label: "1 kg" },
-    { value: 1.5, label: "1.5 kg" },
-    { value: 2, label: "2 kg" },
-    { value: 5, label: "5 kg" },
-];
+import { getShortUnit, getWeightOptions, isSubscriptionEligible } from "../../utils/productUtils";
 
 const subscriptionPlans = [
     { id: "onetime", name: "One-Time Purchase", duration: "", discount: 0, days: 1 },
@@ -25,6 +18,7 @@ function Checkout() {
     const [weight, setWeight] = useState(1);
     const [purchaseType, setPurchaseType] = useState("onetime");
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
     const [showAuthModal, setShowAuthModal] = useState(false);
 
     const isLoggedIn = () => !!localStorage.getItem("access");
@@ -53,8 +47,29 @@ function Checkout() {
         }
 
         setLoading(true);
-        // Simulate checkout process
-        setTimeout(() => {
+        setError(null);
+
+        try {
+            // Calculate total price accurately before passing to orderData
+            const selectedPlan = subscriptionPlans.find(p => p.id === purchaseType);
+            const basePrice = product.price * quantity * weight * selectedPlan.days;
+            const discountAmount = (basePrice * selectedPlan.discount / 100);
+            const calculatedTotal = (basePrice - discountAmount).toFixed(2);
+
+            // Create subscription if not one-time
+            if (purchaseType !== "onetime") {
+                const subscriptionPayload = {
+                    product: product.id,
+                    quantity: quantity,
+                    subscription_type: "daily",
+                    plan_type: purchaseType,
+                    start_date: new Date().toISOString().split('T')[0],
+                    is_active: true
+                };
+                
+                await userAPI.createSubscription(subscriptionPayload);
+            }
+
             const orderData = {
                 items: [{
                     name: product.name,
@@ -62,9 +77,9 @@ function Checkout() {
                     quantity,
                     weight,
                     purchaseType,
-                    price: parseFloat(totalPrice)
+                    price: parseFloat(calculatedTotal)
                 }],
-                total: parseFloat(totalPrice),
+                total: parseFloat(calculatedTotal),
                 orderNumber: Math.random().toString(36).substring(2, 10).toUpperCase(),
                 orderDate: new Date().toLocaleDateString('en-IN', {
                     day: 'numeric',
@@ -72,9 +87,15 @@ function Checkout() {
                     year: 'numeric'
                 })
             };
+
             setLoading(false);
             navigate("/thank-you", { state: { orderData } });
-        }, 1500);
+
+        } catch (err) {
+            console.error("Checkout failed:", err);
+            setError(err.response?.data?.detail || "Failed to process checkout. Please try again.");
+            setLoading(false);
+        }
     };
 
     if (!product) {
@@ -99,6 +120,27 @@ function Checkout() {
 
             <div className="container" style={{ padding: "100px 20px 40px", maxWidth: "800px", margin: "0 auto" }}>
                 <h1 style={{ fontSize: "32px", marginBottom: "32px" }}>Checkout</h1>
+
+                {error && (
+                    <div style={{
+                        background: "rgba(255,68,68,0.1)",
+                        border: "1px solid rgba(255,68,68,0.2)",
+                        color: "var(--danger)",
+                        padding: "16px",
+                        borderRadius: "8px",
+                        marginBottom: "24px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "12px"
+                    }}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        {error}
+                    </div>
+                )}
 
                 <div className="glass-card" style={{ padding: "32px" }}>
                     {/* Product Details */}
@@ -141,7 +183,7 @@ function Checkout() {
                     <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "24px" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
                             <span style={{ color: "var(--text-secondary)" }}>Unit Price</span>
-                            <span style={{ fontSize: "20px", fontWeight: "600" }}>₹ {product.price} / kg</span>
+                            <span style={{ fontSize: "20px", fontWeight: "600" }}>₹ {product.price} / {getShortUnit(product.name)}</span>
                         </div>
 
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
@@ -160,7 +202,7 @@ function Checkout() {
                                     minWidth: "150px"
                                 }}
                             >
-                                {weightOptions.map((option) => (
+                                {getWeightOptions(product.name).map((option) => (
                                     <option key={option.value} value={option.value} style={{ background: "#1e293b" }}>
                                         {option.label}
                                     </option>
@@ -172,7 +214,9 @@ function Checkout() {
                         <div style={{ marginBottom: "16px" }}>
                             <span style={{ color: "var(--text-secondary)", display: "block", marginBottom: "12px" }}>Purchase Type</span>
                             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "12px" }}>
-                                {subscriptionPlans.map((plan) => (
+                                {subscriptionPlans
+                                    .filter(plan => isSubscriptionEligible(product.name) || plan.id === "onetime")
+                                    .map((plan) => (
                                     <div
                                         key={plan.id}
                                         onClick={() => setPurchaseType(plan.id)}
@@ -281,8 +325,8 @@ function Checkout() {
                             <span>{product.name}</span>
                         </div>
                         <div style={{ display: "flex", justifyContent: "space-between" }}>
-                            <span style={{ color: "var(--text-secondary)" }}>Weight</span>
-                            <span>{weightOptions.find(w => w.value === weight)?.label}</span>
+                            <span style={{ color: "var(--text-secondary)" }}>Quantity</span>
+                            <span>{getWeightOptions(product.name).find(w => w.value === weight)?.label}</span>
                         </div>
                         <div style={{ display: "flex", justifyContent: "space-between" }}>
                             <span style={{ color: "var(--text-secondary)" }}>Quantity (per day)</span>

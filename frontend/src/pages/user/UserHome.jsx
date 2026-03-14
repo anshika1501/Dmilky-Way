@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { userAPI } from "../../api/axios";
 import { useCart } from "../../context/CartContext";
 import Navbar from "../../components/Navbar";
+import { getShortUnit, isSubscriptionEligible } from "../../utils/productUtils";
 
 // Subscription plans
 const subscriptionPlans = [
@@ -172,17 +173,19 @@ function UserHome() {
                                     <div style={{ marginTop: '12px' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                                             <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Daily:</span>
-                                            <span style={{ fontSize: '18px', fontWeight: '600' }}>₹{product.price}/kg</span>
+                                            <span style={{ fontSize: '18px', fontWeight: '600' }}>₹{product.price}/{getShortUnit(product.name)}</span>
                                         </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Monthly:</span>
-                                            <span style={{ fontSize: '20px', fontWeight: '700', color: 'var(--primary)' }}>
-                                                ₹{getSubscriptionPrices(product.price).monthly1}
-                                            </span>
-                                            <span style={{ fontSize: '12px', background: 'var(--success)', color: '#fff', padding: '2px 6px', borderRadius: '4px' }}>
-                                                5% OFF
-                                            </span>
-                                        </div>
+                                        {isSubscriptionEligible(product.name) && (
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Monthly:</span>
+                                                <span style={{ fontSize: '20px', fontWeight: '700', color: 'var(--primary)' }}>
+                                                    ₹{getSubscriptionPrices(product.price).monthly1}
+                                                </span>
+                                                <span style={{ fontSize: '12px', background: 'var(--success)', color: '#fff', padding: '2px 6px', borderRadius: '4px' }}>
+                                                    5% OFF
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="product-meta">
@@ -192,13 +195,15 @@ function UserHome() {
                                     <span className="badge badge-success">Available</span>
                                 </div>
                                 <div style={{ display: 'flex', gap: '8px', marginTop: '16px', flexWrap: 'wrap' }}>
-                                    <button
-                                        className="btn-outline"
-                                        style={{ flex: 1, minWidth: '100px', fontSize: '13px', padding: '10px 8px' }}
-                                        onClick={() => openPlanModal(product)}
-                                    >
-                                        View Plans
-                                    </button>
+                                    {isSubscriptionEligible(product.name) && (
+                                        <button
+                                            className="btn-outline"
+                                            style={{ flex: 1, minWidth: '100px', fontSize: '13px', padding: '10px 8px' }}
+                                            onClick={() => openPlanModal(product)}
+                                        >
+                                            View Plans
+                                        </button>
+                                    )}
                                     <button
                                         className="btn-outline"
                                         style={{

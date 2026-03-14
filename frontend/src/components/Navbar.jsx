@@ -70,6 +70,7 @@ function Navbar() {
                                 </span>
                             )}
                         </Link>
+                        <Link to="/admin/login" className={`nav-link ${isActive('/admin/login') ? 'active' : ''}`} style={{ color: 'var(--primary)' }}>Admin</Link>
                         <button onClick={handleLogout} className="nav-btn-logout">Logout</button>
                     </>
                 ) : (
@@ -103,6 +104,7 @@ function Navbar() {
                         </Link>
                         <Link to="/login" className={`nav-link ${isActive('/login') ? 'active' : ''}`}>Login</Link>
                         <Link to="/register" className={`nav-link ${isActive('/register') ? 'active' : ''}`}>Register</Link>
+                        <Link to="/admin/login" className={`nav-link ${isActive('/admin/login') ? 'active' : ''}`} style={{ color: 'var(--primary)' }}>Admin</Link>
                     </>
                 )}
             </div>

@@ -2,14 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import Navbar from "../../components/Navbar";
-
-const weightOptions = [
-    { value: 0.5, label: "Half kg" },
-    { value: 1, label: "1 kg" },
-    { value: 1.5, label: "1.5 kg" },
-    { value: 2, label: "2 kg" },
-    { value: 5, label: "5 kg" },
-];
+import { getShortUnit, getWeightOptions, isSubscriptionEligible } from "../../utils/productUtils";
+import { userAPI } from "../../api/axios";
 
 const subscriptionPlans = {
     onetime: { name: "One-Time", discount: 0, days: 1 },
@@ -30,6 +24,7 @@ function Cart() {
         getCartTotal,
     } = useCart();
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
     const [showAuthModal, setShowAuthModal] = useState(false);
 
     const isLoggedIn = () => !!localStorage.getItem("access");
@@ -41,14 +36,34 @@ function Cart() {
         return basePrice - discount;
     };
 
-    const handleCheckout = () => {
+    const handleCheckout = async () => {
         if (!isLoggedIn()) {
             setShowAuthModal(true);
             return;
         }
 
         setLoading(true);
-        setTimeout(() => {
+        setError(null);
+
+        try {
+            // Process subscriptions
+            const subscriptionPromises = cartItems
+                .filter(item => item.purchaseType !== "onetime")
+                .map(item => {
+                    const subscriptionPayload = {
+                        product: item.product.id,
+                        quantity: item.quantity,
+                        subscription_type: "daily",
+                        plan_type: item.purchaseType,
+                        start_date: new Date().toISOString().split('T')[0],
+                        is_active: true
+                    };
+                    return userAPI.createSubscription(subscriptionPayload);
+                });
+
+            // Wait for all subscriptions to be created
+            await Promise.all(subscriptionPromises);
+
             const orderData = {
                 items: cartItems.map(item => ({
                     name: item.product.name,
@@ -66,10 +81,16 @@ function Cart() {
                     year: 'numeric'
                 })
             };
+
             clearCart();
             setLoading(false);
             navigate("/thank-you", { state: { orderData } });
-        }, 1500);
+
+        } catch (err) {
+            console.error("Checkout failed:", err);
+            setError(err.response?.data?.detail || "Failed to process checkout. Please try again.");
+            setLoading(false);
+        }
     };
 
     if (cartItems.length === 0) {
@@ -113,6 +134,27 @@ function Cart() {
                         Clear Cart
                     </button>
                 </div>
+
+                {error && (
+                    <div style={{
+                        background: "rgba(255,68,68,0.1)",
+                        border: "1px solid rgba(255,68,68,0.2)",
+                        color: "var(--danger)",
+                        padding: "16px",
+                        borderRadius: "8px",
+                        marginBottom: "24px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "12px"
+                    }}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        {error}
+                    </div>
+                )}
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 350px", gap: "32px", alignItems: "flex-start" }}>
                     {/* Cart Items */}
@@ -202,7 +244,6 @@ function Cart() {
                                                         </button>
                                                     </div>
                                                 </div>
-
                                                 {/* Weight */}
                                                 <div>
                                                     <label style={{ fontSize: "12px", color: "var(--text-secondary)", display: "block", marginBottom: "4px" }}>Weight</label>
@@ -218,7 +259,7 @@ function Cart() {
                                                             fontSize: "14px"
                                                         }}
                                                     >
-                                                        {weightOptions.map((opt) => (
+                                                        {getWeightOptions(item.product.name).map((opt) => (
                                                             <option key={opt.value} value={opt.value} style={{ background: "#1e293b" }}>
                                                                 {opt.label}
                                                             </option>
@@ -232,6 +273,7 @@ function Cart() {
                                                     <select
                                                         value={item.purchaseType}
                                                         onChange={(e) => updatePurchaseType(index, e.target.value)}
+                                                        disabled={!isSubscriptionEligible(item.product.name)}
                                                         style={{
                                                             padding: "6px 12px",
                                                             borderRadius: "8px",
@@ -241,7 +283,9 @@ function Cart() {
                                                             fontSize: "14px"
                                                         }}
                                                     >
-                                                        {Object.entries(subscriptionPlans).map(([key, p]) => (
+                                                        {Object.entries(subscriptionPlans)
+                                                            .filter(([key]) => isSubscriptionEligible(item.product.name) || key === "onetime")
+                                                            .map(([key, p]) => (
                                                             <option key={key} value={key} style={{ background: "#1e293b" }}>
                                                                 {p.name} {p.discount > 0 ? `(${p.discount}% off)` : ""}
                                                             </option>
@@ -252,7 +296,7 @@ function Cart() {
 
                                             <div style={{ marginTop: "12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                                 <span style={{ fontSize: "13px", color: "var(--text-secondary)" }}>
-                                                    ₹{item.product.price}/kg × {item.quantity} × {item.weight}kg × {plan.days} days
+                                                    ₹{item.product.price}/{getShortUnit(item.product.name)} × {item.quantity} × {item.weight}{getShortUnit(item.product.name)} × {plan.days} days
                                                     {plan.discount > 0 && <span style={{ color: "var(--success)" }}> (-{plan.discount}%)</span>}
                                                 </span>
                                                 <span style={{ fontSize: "20px", fontWeight: "700", color: "var(--primary)" }}>

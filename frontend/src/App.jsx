@@ -10,6 +10,7 @@ import Category from "./pages/admin/Category";
 import Product from "./pages/admin/Product";
 import Subscription from "./pages/admin/Subscription";
 import Staff from "./pages/admin/Staff";
+import AdminLogin from "./pages/admin/AdminLogin";
 
 // User Pages
 import UserHome from "./pages/user/UserHome";
@@ -36,6 +37,7 @@ function App() {
           <Route path="/thank-you" element={<ThankYou />} />
 
           {/* ── Admin Routes (nested under /admin) ── */}
+          <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<DashboardLayout />}>
             <Route index element={<Customer />} />
             <Route path="customer" element={<Customer />} />
