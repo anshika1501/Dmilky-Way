@@ -19,4 +19,19 @@ jobs:
 
           script: |
             cd /home/anshu/Dmilky-Way
+
+            echo "Pulling latest code"
             git pull origin main
+
+            echo "Updating backend"
+            cd backend
+            source venv/bin/activate
+            pip install -r requirements.txt
+
+            echo "Updating frontend"
+            cd ../frontend
+            npm install
+            npm run build
+
+            echo "Restarting services"
+            pm2 restart all
