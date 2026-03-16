@@ -20,13 +20,16 @@ jobs:
           script: |
             set -e
 
+            # Force load standard Ubuntu profile configurations
+            source ~/.profile || true
+            source ~/.bashrc || true
+
             # Load NVM and node binaries explicitly
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
             
-            # Fallback for npm path if NVM didn't set it (useful for globally installed Node)
-            export PATH=$PATH:/usr/bin:/usr/local/bin:$HOME/.nvm/versions/node/$(nvm current 2>/dev/null || echo "system")/bin
+            # Additional fallback for global npm installations
+            export PATH=$PATH:/usr/bin:/usr/local/bin:/snap/bin
 
             cd /home/anshu/Dmilky-Way
 
@@ -43,10 +46,24 @@ jobs:
 
             echo "Updating frontend"
             cd ../frontend
-            npm install
-            npm run build
+            
+            # Use explicit nvm run or fallback to system npm
+            if [ -x "$(command -v npm)" ]; then
+              npm install
+              npm run build
+            elif [ -s "$NVM_DIR/nvm.sh" ]; then
+              nvm use default || nvm use node
+              npm install
+              npm run build
+            else
+              # If all else fails, try explicit path
+              ~/.nvm/versions/node/$(ls ~/.nvm/versions/node/ | sort -V | tail -n1)/bin/npm install
+              ~/.nvm/versions/node/$(ls ~/.nvm/versions/node/ | sort -V | tail -n1)/bin/npm run build
+            fi
 
             echo "Restarting services"
+            # Explicitly load pm2 if needed
+            export PATH=$PATH:~/.npm-global/bin
             pm2 restart django-backend
             pm2 restart milkman
             pm2 restart milkman-api
