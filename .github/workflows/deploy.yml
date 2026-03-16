@@ -34,4 +34,7 @@ jobs:
             npm run build
 
             echo "Restarting services"
-            pm2 restart all
+            pm2 restart django-backend
+            pm2 restart milkman
+            pm2 restart milkman-api
+            pm2 restart next-app
