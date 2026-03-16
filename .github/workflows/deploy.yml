@@ -18,6 +18,9 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
 
           script: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
             cd /home/anshu/Dmilky-Way
 
             echo "Pulling latest code"
@@ -25,8 +28,7 @@ jobs:
 
             echo "Updating backend"
             cd backend
-            source .venv/bin/activate
-            pip install -r requirements.txt
+            ./.venv/bin/pip install -r requirements.txt
 
             echo "Updating frontend"
             cd ../frontend
