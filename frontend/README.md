@@ -4,7 +4,7 @@
 This project has:
 - Backend: Django REST API in `milkman/` (port 8000)
 - Frontend: React + Vite app in `backened/` (port 5173)
-
+-PM2: Process Manager for Node.js apps
 ## Prerequisites
 
 - Node.js 18+ and npm
