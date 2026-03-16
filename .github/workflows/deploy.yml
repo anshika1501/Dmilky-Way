@@ -20,8 +20,13 @@ jobs:
           script: |
             set -e
 
+            # Load NVM and node binaries explicitly
             export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+            
+            # Fallback for npm path if NVM didn't set it (useful for globally installed Node)
+            export PATH=$PATH:/usr/bin:/usr/local/bin:$HOME/.nvm/versions/node/$(nvm current 2>/dev/null || echo "system")/bin
 
             cd /home/anshu/Dmilky-Way
 
