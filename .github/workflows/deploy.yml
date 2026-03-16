@@ -52,17 +52,23 @@ jobs:
               npm install
               npm run build
             elif [ -s "$NVM_DIR/nvm.sh" ]; then
-              nvm use default || nvm use node
-              npm install
-              npm run build
+              # Find the first installed node version and use it
+              INSTALLED_NODE=$(nvm ls --no-colors | grep -o 'v[0-9]*\.[0-9]*\.[0-9]*' | tail -1)
+              if [ -n "$INSTALLED_NODE" ]; then
+                nvm use "$INSTALLED_NODE"
+                npm install
+                npm run build
+              else
+                echo "NVM is installed but no Node versions found."
+                exit 1
+              fi
             else
-              # If all else fails, try explicit path
-              ~/.nvm/versions/node/$(ls ~/.nvm/versions/node/ | sort -V | tail -n1)/bin/npm install
-              ~/.nvm/versions/node/$(ls ~/.nvm/versions/node/ | sort -V | tail -n1)/bin/npm run build
+              # If all else fails
+              echo "Could not find NVM or NPM."
+              exit 1
             fi
 
             echo "Restarting services"
-            # Explicitly load pm2 if needed
             export PATH=$PATH:~/.npm-global/bin
             pm2 restart django-backend
             pm2 restart milkman
