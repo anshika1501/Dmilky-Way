@@ -18,17 +18,23 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
 
           script: |
+            set -e
+
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
             cd /home/anshu/Dmilky-Way
 
             echo "Pulling latest code"
-            git pull origin main
+            git fetch --all
+            git reset --hard origin/main
 
             echo "Updating backend"
             cd backend
+            [ ! -d ".venv" ] && python3 -m venv .venv
             ./.venv/bin/pip install -r requirements.txt
+            ./.venv/bin/python manage.py migrate
+            ./.venv/bin/python manage.py collectstatic --noinput
 
             echo "Updating frontend"
             cd ../frontend
@@ -39,4 +45,4 @@ jobs:
             pm2 restart django-backend
             pm2 restart milkman
             pm2 restart milkman-api
-            pm2 restart next-app
+            # pm2 restart next-app  # Commented out as Next.js is not used with Vite+React setup
